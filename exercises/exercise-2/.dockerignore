@@ -1,0 +1,7 @@
+# Prevent sensitive or irrelevant files from being sent to the Docker build context
+*.sh
+*.md
+.git
+.gitignore
+.env
+.dockerignore
