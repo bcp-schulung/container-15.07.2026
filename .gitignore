@@ -1,0 +1,14 @@
+# Environment / credentials
+.env
+container-seminar-credentials.md
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+
+# macOS
+.DS_Store
