@@ -1,5 +1,7 @@
-# Environment / credentials
+# Environment / secrets — never commit
 .env
+.passwords.json
+.harbor-passwords.json
 container-seminar-credentials.md
 
 # Python
@@ -12,3 +14,4 @@ env/
 
 # macOS
 .DS_Store
+**/.DS_Store
