@@ -466,6 +466,17 @@ _HELM_INSTALL = """\
 curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 """
 
+_TRIVY_INSTALL = """\
+curl -fsSL https://aquasecurity.github.io/trivy-repo/deb/public.key \
+    | gpg --dearmor -o /usr/share/keyrings/trivy.gpg
+chmod a+r /usr/share/keyrings/trivy.gpg
+echo 'deb [signed-by=/usr/share/keyrings/trivy.gpg] \
+https://aquasecurity.github.io/trivy-repo/deb generic main' \
+    | tee /etc/apt/sources.list.d/trivy.list >/dev/null
+apt-get update -qq
+DEBIAN_FRONTEND=noninteractive apt-get install -y -qq trivy
+"""
+
 
 def configure_vm(ip: str, slug: str, password: str) -> None:
     """
@@ -526,6 +537,9 @@ def configure_vm(ip: str, slug: str, password: str) -> None:
 
         log(f"  [{slug}] Installing Helm ...")
         c.run(_HELM_INSTALL, hide=True)
+
+        log(f"  [{slug}] Installing Trivy ...")
+        c.run(_TRIVY_INSTALL, hide=True)
 
     log(f"  [{slug}] VM setup complete.")
 
