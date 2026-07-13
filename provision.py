@@ -22,6 +22,7 @@ Usage:
 from __future__ import annotations
 
 import io
+import json
 import os
 import secrets
 import string
@@ -51,6 +52,7 @@ LOCATION_NAME    = "hel1"                        # Helsinki, Finland
 DOMAIN_SUFFIX    = "container.it-scholar.com"
 HETZNER_KEY_NAME = "container-seminar-provisioner"
 FW_NAME          = "container-seminar-fw"
+PASSWORDS_FILE   = Path(__file__).parent / ".passwords.json"
 
 # slug   : used for the Hetzner VM name and DNS subdomain (ASCII, no umlauts)
 # display: shown in the summary / credentials file
@@ -126,6 +128,27 @@ def log(msg: str) -> None:
 def gen_password(length: int = 16) -> str:
     alphabet = string.ascii_letters + string.digits
     return "".join(secrets.choice(alphabet) for _ in range(length))
+
+
+def load_or_generate_passwords() -> dict[str, str]:
+    """Load persisted passwords from disk; generate and save if absent."""
+    slugs = [s["slug"] for s in STUDENTS]
+    if PASSWORDS_FILE.exists():
+        data = json.loads(PASSWORDS_FILE.read_text())
+        # Generate only for new students not already in the file
+        updated = False
+        for slug in slugs:
+            if slug not in data:
+                data[slug] = gen_password()
+                updated = True
+        if updated:
+            PASSWORDS_FILE.write_text(json.dumps(data, indent=2))
+        log(f"Loaded passwords from {PASSWORDS_FILE}")
+        return {slug: data[slug] for slug in slugs}
+    passwords = {slug: gen_password() for slug in slugs}
+    PASSWORDS_FILE.write_text(json.dumps(passwords, indent=2))
+    log(f"Generated and saved passwords to {PASSWORDS_FILE}")
+    return passwords
 
 
 def connection(ip: str, user: str = "root") -> Connection:
@@ -548,7 +571,7 @@ def configure_all_vms(vm_ips: dict[str, str]) -> dict[str, str]:
     """Phase 4: configure all VMs in parallel. Returns {slug: password}."""
     log("=== Phase 4: code-server + Caddy + Docker + kubectl + Helm ===")
 
-    passwords: dict[str, str] = {s["slug"]: gen_password() for s in STUDENTS}
+    passwords = load_or_generate_passwords()
 
     with ThreadPoolExecutor(max_workers=len(STUDENTS)) as pool:
         futures = {
