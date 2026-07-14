@@ -43,6 +43,24 @@ module "kubernetes" {
   # Allow the Kubernetes API (port 6443) from anywhere for seminar access.
   firewall_kube_api_source = ["0.0.0.0/0", "::/0"]
 
+  # Allow NodePort traffic on the default range from external clients.
+  firewall_extra_rules = [
+    {
+      description = "Allow NodePort TCP traffic"
+      direction   = "in"
+      source_ips  = ["0.0.0.0/0", "::/0"]
+      protocol    = "tcp"
+      port        = "30000-32767"
+    },
+    {
+      description = "Allow NodePort UDP traffic"
+      direction   = "in"
+      source_ips  = ["0.0.0.0/0", "::/0"]
+      protocol    = "udp"
+      port        = "30000-32767"
+    }
+  ]
+
   # ── Node pools ──────────────────────────────────────────────────────────────
   # cpx32: 4 vCPU / 8 GB RAM, hel1 — same spec as cx33 but different hardware pool.
   # cx33/cpx31 are exhausted in hel1; cpx32 runs on a separate pool and is available.
