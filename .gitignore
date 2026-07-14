@@ -3,6 +3,9 @@
 .passwords.json
 .harbor-passwords.json
 container-seminar-credentials.md
+student-credentials/
+*.kubeconfig
+*.talosconfig
 
 # Python
 __pycache__/

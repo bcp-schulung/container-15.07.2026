@@ -40,6 +40,9 @@ module "kubernetes" {
   cilium_gateway_api_enabled = true
   cert_manager_enabled       = true
 
+  # Allow the Kubernetes API (port 6443) from anywhere for seminar access.
+  firewall_kube_api_source = ["0.0.0.0/0", "::/0"]
+
   # ── Node pools ──────────────────────────────────────────────────────────────
   # cpx32: 4 vCPU / 8 GB RAM, hel1 — same spec as cx33 but different hardware pool.
   # cx33/cpx31 are exhausted in hel1; cpx32 runs on a separate pool and is available.
