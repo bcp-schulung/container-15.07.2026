@@ -25,7 +25,7 @@ services:
       DB_USER: postgres
       DB_PASSWORD: postgres
     ports:
-      - "3000:3000"
+      - "4000:3000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -33,7 +33,7 @@ services:
   frontend:
     image: ghcr.io/bcp-schulung/container-15.07.2026/joke-frontend:latest
     environment:
-      BACKEND_URL: http://localhost:3000
+      BACKEND_URL: http://localhost:4000
       PORT: 8080
     ports:
       - "8080:8080"
