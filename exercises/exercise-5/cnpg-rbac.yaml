@@ -49,19 +49,29 @@ rules:
     resources: ["databases"]
     verbs: ["create", "delete", "deletecollection", "get", "list", "patch", "update", "watch"]
 
-  # Publishers
-  - apiGroups: ["postgresql.cnpg.io"]
-    resources: ["publishers"]
-    verbs: ["create", "delete", "deletecollection", "get", "list", "patch", "update", "watch"]
-
   # Subscriptions
   - apiGroups: ["postgresql.cnpg.io"]
     resources: ["subscriptions"]
     verbs: ["create", "delete", "deletecollection", "get", "list", "patch", "update", "watch"]
 
-  # Read CNPG cluster network policies
+  # Publications (logical replication)
   - apiGroups: ["postgresql.cnpg.io"]
-    resources: ["clusternetworkpolicies"]
+    resources: ["publications"]
+    verbs: ["create", "delete", "deletecollection", "get", "list", "patch", "update", "watch"]
+
+  # Failover Quorums
+  - apiGroups: ["postgresql.cnpg.io"]
+    resources: ["failoverquorums"]
+    verbs: ["create", "delete", "deletecollection", "get", "list", "patch", "update", "watch"]
+
+  # Image Catalogs
+  - apiGroups: ["postgresql.cnpg.io"]
+    resources: ["imagecatalogs"]
+    verbs: ["get", "list", "watch"]
+
+  # Cluster Image Catalogs (cluster-scoped)
+  - apiGroups: ["postgresql.cnpg.io"]
+    resources: ["clusterimagecatalogs"]
     verbs: ["get", "list", "watch"]
 
   # Standard K8s resources needed by CNPG
@@ -109,6 +119,41 @@ rules:
   - apiGroups: ["batch"]
     resources: ["cronjobs"]
     verbs: ["get", "list", "watch"]
+
+  # Events (for troubleshooting)
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["get", "list", "watch"]
+
+  # Namespaces (read access)
+  - apiGroups: [""]
+    resources: ["namespaces"]
+    verbs: ["get", "list", "watch"]
+
+  # Resource Quotas
+  - apiGroups: [""]
+    resources: ["resourcequotas"]
+    verbs: ["get", "list", "watch"]
+
+  # Limit Ranges
+  - apiGroups: [""]
+    resources: ["limitranges"]
+    verbs: ["get", "list", "watch"]
+
+  # Endpoints (service discovery)
+  - apiGroups: [""]
+    resources: ["endpoints"]
+    verbs: ["get", "list", "watch"]
+
+  # Pod Disruption Budgets (HA management)
+  - apiGroups: ["policy"]
+    resources: ["poddisruptionbudgets"]
+    verbs: ["get", "list", "watch"]
+
+  # Ingress (for connecting to databases)
+  - apiGroups: ["networking.k8s.io"]
+    resources: ["ingresses"]
+    verbs: ["get", "list", "watch", "create", "delete", "patch", "update"]
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
