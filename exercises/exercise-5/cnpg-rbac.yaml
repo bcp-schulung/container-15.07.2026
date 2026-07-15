@@ -1,0 +1,126 @@
+---
+# CloudNativePG (CNPG) Role for Students
+# This role grants permissions to create, read, update, and delete CNPG resources
+# Apply this role to each student namespace and bind it to the student service account
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: cnpg-admin
+  namespace: default  # Replace with each student's namespace
+rules:
+  # Full permissions on all CNPG cluster resources
+  - apiGroups: ["postgresql.cnpg.io"]
+    resources: ["clusters"]
+    verbs: ["create", "delete", "deletecollection", "get", "list", "patch", "update", "watch"]
+
+  # Cluster status subresource
+  - apiGroups: ["postgresql.cnpg.io"]
+    resources: ["clusters/status"]
+    verbs: ["get", "patch", "update", "watch"]
+
+  # Backups
+  - apiGroups: ["postgresql.cnpg.io"]
+    resources: ["backups"]
+    verbs: ["create", "delete", "deletecollection", "get", "list", "patch", "update", "watch"]
+
+  # Scheduled backups
+  - apiGroups: ["postgresql.cnpg.io"]
+    resources: ["scheduledbackups"]
+    verbs: ["create", "delete", "deletecollection", "get", "list", "patch", "update", "watch"]
+
+  # Scheduled backups status
+  - apiGroups: ["postgresql.cnpg.io"]
+    resources: ["scheduledbackups/status"]
+    verbs: ["get", "patch", "update", "watch"]
+
+  # Poolers
+  - apiGroups: ["postgresql.cnpg.io"]
+    resources: ["poolers"]
+    verbs: ["create", "delete", "deletecollection", "get", "list", "patch", "update", "watch"]
+
+  # Poolers status
+  - apiGroups: ["postgresql.cnpg.io"]
+    resources: ["poolers/status"]
+    verbs: ["get", "patch", "update", "watch"]
+
+  # Database resources
+  - apiGroups: ["postgresql.cnpg.io"]
+    resources: ["databases"]
+    verbs: ["create", "delete", "deletecollection", "get", "list", "patch", "update", "watch"]
+
+  # Publishers
+  - apiGroups: ["postgresql.cnpg.io"]
+    resources: ["publishers"]
+    verbs: ["create", "delete", "deletecollection", "get", "list", "patch", "update", "watch"]
+
+  # Subscriptions
+  - apiGroups: ["postgresql.cnpg.io"]
+    resources: ["subscriptions"]
+    verbs: ["create", "delete", "deletecollection", "get", "list", "patch", "update", "watch"]
+
+  # Read CNPG cluster network policies
+  - apiGroups: ["postgresql.cnpg.io"]
+    resources: ["clusternetworkpolicies"]
+    verbs: ["get", "list", "watch"]
+
+  # Standard K8s resources needed by CNPG
+  # ConfigMaps in the namespace
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["create", "delete", "get", "list", "patch", "update", "watch"]
+
+  # Secrets in the namespace
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["create", "delete", "get", "list", "patch", "update", "watch"]
+
+  # Services
+  - apiGroups: [""]
+    resources: ["services"]
+    verbs: ["create", "delete", "get", "list", "patch", "update", "watch"]
+
+  # Pods (for debugging and monitoring)
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "watch"]
+
+  # Pod logs
+  - apiGroups: [""]
+    resources: ["pods/log"]
+    verbs: ["get"]
+
+  # Persistent Volume Claims (for stateful storage)
+  - apiGroups: [""]
+    resources: ["persistentvolumeclaims"]
+    verbs: ["get", "list", "watch"]
+
+  # StatefulSets (for CNPG instances)
+  - apiGroups: ["apps"]
+    resources: ["statefulsets"]
+    verbs: ["get", "list", "watch"]
+
+  # Jobs (for backups)
+  - apiGroups: ["batch"]
+    resources: ["jobs"]
+    verbs: ["get", "list", "watch"]
+
+  # Cronjobs (for scheduled backups)
+  - apiGroups: ["batch"]
+    resources: ["cronjobs"]
+    verbs: ["get", "list", "watch"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: cnpg-admin-binding
+  namespace: default  # Replace with each student's namespace
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: cnpg-admin
+subjects:
+  - kind: ServiceAccount
+    name: student
+    namespace: default  # Replace with each student's namespace

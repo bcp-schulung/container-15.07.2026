@@ -1,0 +1,61 @@
+# Example CloudNativePG Cluster
+# 
+# This is a minimal example of a CNPG cluster manifest.
+# Students can use this as a starting point for their exercises.
+#
+# Usage:
+#   kubectl apply -f cluster-example.yaml
+
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: postgres-example
+spec:
+  # Number of instances (minimum 3 recommended for HA)
+  instances: 1
+
+  # PostgreSQL version
+  imageCatalog: "postgresql"
+  imageName: "15.3"
+
+  # Bootstrap configuration
+  bootstrap:
+    initdb:
+      database: "mydb"
+      owner: "postgres"
+
+  # Storage configuration
+  storage:
+    size: 10Gi
+    storageClass: "standard"  # Adjust to your cluster's storage classes
+
+  # Monitoring (optional)
+  monitoring:
+    enabled: false
+
+  # Backup configuration (optional)
+  # backup:
+  #   barmanObjectStore:
+  #     destinationPath: s3://your-bucket/path
+  #     s3Credentials:
+  #       accessKeyId:
+  #         name: backup-credentials
+  #         key: AWS_ACCESS_KEY_ID
+  #       secretAccessKey:
+  #         name: backup-credentials
+  #         key: AWS_SECRET_ACCESS_KEY
+
+---
+# Example: Service to expose the primary pod
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-example-service
+spec:
+  selector:
+    cnpg.io/cluster: postgres-example
+    cnpg.io/podRole: primary
+  ports:
+    - port: 5432
+      targetPort: 5432
+  type: ClusterIP
