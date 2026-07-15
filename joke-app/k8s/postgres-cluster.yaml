@@ -1,0 +1,50 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: postgres
+spec:
+  instances: 1
+  storage:
+    size: 1Gi
+  bootstrap:
+    initdb:
+      database: jokes
+      owner: postgres
+      secret:
+        name: postgres-secret
+      postInitApplicationSQLRefs:
+        configMapRefs:
+          - name: postgres-schema
+            key: schema.sql
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-schema
+data:
+  schema.sql: |
+    CREATE TABLE jokes (
+      id SERIAL PRIMARY KEY,
+      setup TEXT NOT NULL,
+      punchline TEXT NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+
+    INSERT INTO jokes (setup, punchline) VALUES
+    ('Why do programmers prefer dark mode?', 'Because light attracts bugs.'),
+    ('How many programmers does it take to change a light bulb?', 'None, that''s a hardware problem.'),
+    ('Why was the JavaScript developer sad?', 'Because he didn''t Node how to Express his feelings.'),
+    ('What do you call a fake noodle?', 'An impasta.'),
+    ('Why do Java developers wear glasses?', 'Because they cannot C#.'),
+    ('How does a developer make a milkshake?', 'They give the browser a shake event.'),
+    ('Why do Python programmers wear glasses?', 'Because they can''t C.'),
+    ('What is a programmer''s favorite place?', 'Debug Mode.');
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgres-secret
+type: kubernetes.io/basic-auth
+stringData:
+  username: postgres
+  password: postgres
