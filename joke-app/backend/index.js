@@ -2,7 +2,7 @@ const express = require('express');
 const { Pool } = require('pg');
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 const pool = new Pool({
   host: process.env.DB_HOST || 'localhost',
@@ -11,6 +11,20 @@ const pool = new Pool({
   user: process.env.DB_USER || 'postgres',
   password: process.env.DB_PASSWORD || 'postgres'
 });
+
+async function testConnection() {
+  for (let i = 0; i < 10; i++) {
+    try {
+      await pool.query('SELECT 1');
+      console.log('Connected to PostgreSQL');
+      return;
+    } catch (err) {
+      console.log(`Waiting for PostgreSQL... (${i + 1}/10)`);
+      await new Promise(res => setTimeout(res, 2000));
+    }
+  }
+  console.error('Could not connect to PostgreSQL');
+}
 
 app.use(express.json());
 
@@ -42,6 +56,8 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
-app.listen(port, () => {
-  console.log(`Backend running on http://localhost:${port}`);
+testConnection().then(() => {
+  app.listen(port, () => {
+    console.log(`Backend running on http://localhost:${port}`);
+  });
 });
