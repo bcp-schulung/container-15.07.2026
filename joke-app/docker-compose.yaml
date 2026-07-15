@@ -17,7 +17,7 @@ services:
       retries: 5
 
   backend:
-    image: joke-backend:latest
+    image: ghcr.io/bcp-schulung/container-15.07.2026/joke-backend:latest
     environment:
       DB_HOST: postgres
       DB_PORT: 5432
@@ -31,7 +31,7 @@ services:
         condition: service_healthy
 
   frontend:
-    image: joke-frontend:latest
+    image: ghcr.io/bcp-schulung/container-15.07.2026/joke-frontend:latest
     environment:
       BACKEND_URL: http://localhost:3000
       PORT: 8080
